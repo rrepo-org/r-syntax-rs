@@ -1,0 +1,26 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/r-source",
+    "crates/r-syntax",
+    "crates/r-lexer",
+    "crates/r-parser",
+    "crates/r-roxygen",
+    "crates/r-conformance",
+    "xtask",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+rust-version = "1.81"
+
+[workspace.dependencies]
+rowan = "0.17"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = "warn"
