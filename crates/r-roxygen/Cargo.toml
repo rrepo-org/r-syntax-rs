@@ -1,0 +1,16 @@
+[package]
+name = "r-roxygen"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+r-lexer = { path = "../r-lexer" }
+r-parser = { path = "../r-parser" }
+r-source = { path = "../r-source" }
+r-syntax = { path = "../r-syntax" }
+rowan.workspace = true
+
+[lints]
+workspace = true

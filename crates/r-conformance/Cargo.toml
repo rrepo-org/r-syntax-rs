@@ -1,0 +1,16 @@
+[package]
+name = "r-conformance"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+r-lexer = { path = "../r-lexer" }
+r-parser = { path = "../r-parser" }
+r-roxygen = { path = "../r-roxygen" }
+r-syntax = { path = "../r-syntax" }
+
+[lints]
+workspace = true
