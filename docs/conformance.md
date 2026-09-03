@@ -32,33 +32,38 @@ Their reviewed TSV fingerprints are Rust regression expectations. Tests also
 exercise arbitrary UTF-8 strings, every lexer-token-boundary prefix, repeated
 parsing, and concurrent parsing without a `cargo-fuzz` dependency.
 
-## Offline oracle protocol
+## Corpus oracle protocol
 
-R 4.6.1 and roxygen2 8.1.0 are reference oracles only for a separately operated,
-explicit fixture-generation workflow outside production and outside `xtask`.
-Nothing in this repository automatically discovers, installs, fetches, embeds,
-starts, or invokes R. Tests and checks consume reviewed, committed fixture data.
+R 4.6.1 and roxygen2 8.1.0 are reference profiles, not production dependencies.
+The parser, production crates, build scripts, and default tests do not discover,
+install, start, or invoke R. Tests and checks consume reviewed fixture data and
+remain network-, container-, and R-free.
 
-No committed fixture currently establishes executable-oracle parity. Producing
-that evidence remains external work and requires an exactly provisioned R 4.6.1
-environment (plus roxygen2 8.1.0 for documentation observations).
+Executable comparison is an explicit `cargo xtask corpus oracle` operation. It
+accepts only Docker or Podman and an OCI image named by a full `@sha256:` digest;
+it never invokes host R. The container has no network, a read-only root and
+read-only corpus/script mounts, dropped capabilities, no-new-privileges, bounded
+CPU, memory, and PIDs, and a small `noexec` temporary filesystem. The checked-in
+script calls `parse(..., keep.source = TRUE)` but does not source, evaluate,
+load, install, or otherwise execute corpus code.
 
-Fixture producers must:
+Oracle producers must:
 
-1. Run manually or in an explicitly provisioned oracle CI job, never as a build
-   script, test fallback, library call, or default task.
-2. Pin exact R 4.6.1, roxygen2 8.1.0, locale, platform metadata, and generation
-   script revision in provenance.
+1. Run manually or in explicitly provisioned oracle CI, never as a build script,
+   test fallback, production parser call, or default task.
+2. Pin exact R 4.6.1, roxygen2 8.1.0, image digest, locale, platform, and oracle
+   script digest in provenance.
 3. Capture source inputs and raw oracle outputs before translating them into
    assertions; do not treat R's internal parse-data shape as the required CST.
-4. Review and commit regenerated fixtures as ordinary source changes.
-5. Fail closed when fixtures are absent or stale. Never consult ambient R to
-   make a failing test pass.
+4. Match each result to the decoded-source SHA-256 and fail closed on missing,
+   duplicate, extra, or mismatched records.
+5. Review promoted observations as ordinary source changes; never consult
+   ambient R to make a failing test pass.
 
-`OracleRecord` stores declared implementation/version, generation timestamp,
-script revision, and a human-readable command description. It is data only and
-has no execution method. Production parser behavior is entirely independent of
-this metadata.
+The process-free `r-conformance::OracleRecord` remains data only. The corpus
+tool's separate oracle ledger records image, R version, locale, platform, and
+the hash of the exact embedded script mounted into the container. Production
+parser behavior is entirely independent of both forms of metadata.
 
 ## Comparison levels
 
@@ -73,3 +78,14 @@ this metadata.
 Every oracle disagreement is triaged: implementation defect, intentional CST
 shape difference, unsupported semantic behavior, or version-specific fixture.
 Oracle output is evidence, not an unchecked golden truth.
+
+## Differential gates
+
+Candidate crashes, signals, invariant violations, resource-limit failures,
+missing candidate cases, source mismatches, and R-accepts/candidate-rejects are
+hard failures. Candidate/R acceptance differences otherwise require review;
+R-rejects/candidate-accepts is hard only for curated cases. Acquisition,
+decoding, archive, oracle-infrastructure, and thresholded performance findings
+remain visible and are never dropped by an inner join. Stable, path-independent
+signatures cluster equivalent findings. Full corpus accounting, replay bundles,
+and minimization are specified in [`corpus.md`](corpus.md).

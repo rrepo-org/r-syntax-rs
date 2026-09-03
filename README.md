@@ -15,11 +15,15 @@ roxygen comments. The implemented workspace contains:
   example bodies.
 - `r-conformance`: canonical production adapters, frozen process-free fixtures,
   stable regression fingerprints, and property-style harness functions.
-- `xtask`: repository inventory and consistency checks.
+- `r-corpus`: durable rrepo acquisition, content-addressed source storage,
+  isolated parser workers, differential gates, and reproducible reports.
+- `xtask`: repository checks and explicit corpus workflows.
 
 The default compatibility targets are exactly R 4.6.1, roxygen2 8.1.0, and
-Rowan 0.17. These are pinned data profiles. No crate, test, build script, or
-`xtask` command discovers or invokes R.
+Rowan 0.17. These are pinned data profiles. The parser, production crates,
+build scripts, and default tests neither discover nor invoke R. The only
+executable R path is the explicit opt-in corpus oracle: it starts a
+digest-pinned, network-disabled container and never invokes host R.
 
 ## Commands
 
@@ -27,14 +31,23 @@ Rowan 0.17. These are pinned data profiles. No crate, test, build script, or
 cargo test --workspace
 cargo run -p xtask -- inventory
 cargo run -p xtask -- check
+cargo xtask corpus snapshot --help
+cargo xtask corpus collect --help
+cargo xtask corpus run --help
+cargo xtask corpus oracle --help
+cargo xtask corpus diff --help
+cargo xtask corpus replay --help
+cargo xtask corpus minimize --help
 cargo fmt --all --check
 cargo clippy --workspace --all-targets -- -D warnings
 ```
 
-The `xtask` commands inspect committed repository files only. The conformance
-fixtures exercise this Rust implementation; they are not evidence of oracle
-parity. Exact comparison with R still requires a separately provisioned R
-4.6.1 environment and reviewed, externally generated observations.
+`inventory` and `check` inspect committed repository files only. The `corpus`
+subcommands are explicit integration operations; only snapshot/collection use
+the network, and only `corpus oracle` starts a container. See
+[`docs/corpus.md`](docs/corpus.md) for inputs, artifacts, safety rules, caching,
+and gate policy. Default `cargo test --workspace` remains network-, container-,
+and R-free.
 
 ## Contracts
 
@@ -44,3 +57,4 @@ parity. Exact comparison with R still requires a separately provisioned R
 - [`docs/operators.md`](docs/operators.md): precedence and associativity contract
 - [`docs/roxygen.md`](docs/roxygen.md): sidecar architecture and public contract
 - [`docs/conformance.md`](docs/conformance.md): canonical fixtures and oracle boundary
+- [`docs/corpus.md`](docs/corpus.md): acquisition and differential corpus operations
