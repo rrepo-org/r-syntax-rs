@@ -19,14 +19,15 @@ recreated on the calling thread.
 2. A closed grammar production inventory in `grammar.md`.
 3. An operator and context contract in `operators.md`.
 4. Parser-time checks and recovery rules below.
-5. A process-free conformance model and offline oracle protocol in
+5. A process-free default conformance model and opt-in corpus oracle protocol in
    `conformance.md`.
 
 All five repository deliverables are implemented. The workspace now includes
 source, syntax, lexer, parser, roxygen sidecar, conformance, and `xtask` crates.
-Committed conformance fixtures validate Rust behavior without a process or
-network dependency. Executable comparison against exact R 4.6.1 has not been
-run as part of this repository work and is not implied by this status.
+The `r-corpus` crate adds durable acquisition and differential testing without
+changing parser behavior. Committed conformance fixtures and default tests
+validate Rust behavior without network, containers, or R. Executable comparison
+is a separate, explicit `cargo xtask corpus oracle` operation.
 
 ## Parser-time checks
 
@@ -65,8 +66,9 @@ Given profile plus decoded source, token/tree/diagnostic fingerprints are stable
 
 - Evaluating R, constructing SEXPs, resolving names, loading packages, or
   reproducing runtime errors.
-- Installing, discovering, starting, embedding, or automatically invoking R or
-  roxygen2.
+- Installing, discovering, embedding, or automatically invoking host R or
+  roxygen2. The opt-in corpus oracle may start only a digest-pinned,
+  network-disabled R container and parses source without executing it.
 - Implementing roxygen roclets, package collation, Rd rendering, examples, or
   documentation execution.
 - Byte decoding or encoding detection; callers supply decoded UTF-8 and retain
@@ -76,6 +78,6 @@ Given profile plus decoded source, token/tree/diagnostic fingerprints are stable
   threads.
 - Claiming grammar equivalence from a tree fingerprint alone. Fingerprints are
   stable regression identifiers, not cryptographic proofs.
-- Claiming acceptance, diagnostic, parse-data, or documentation parity with R
-  4.6.1/roxygen2 8.1.0 until externally generated oracle observations have been
-  provisioned, reviewed, and committed.
+- Claiming acceptance, diagnostic, parse-data, or documentation parity from a
+  corpus run alone. Oracle observations remain versioned evidence that must be
+  reviewed and interpreted according to `conformance.md`.

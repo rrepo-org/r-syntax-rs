@@ -1,0 +1,33 @@
+[package]
+name = "r-corpus"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+clap.workspace = true
+flate2.workspace = true
+r-conformance = { path = "../r-conformance" }
+r-parser = { path = "../r-parser" }
+r-roxygen = { path = "../r-roxygen" }
+r-source = { path = "../r-source" }
+r-syntax = { path = "../r-syntax" }
+reqwest.workspace = true
+rusqlite.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+sysinfo.workspace = true
+tar.workspace = true
+tempfile.workspace = true
+wait-timeout.workspace = true
+zstd.workspace = true
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "r-parse-worker"
+path = "src/bin/r-parse-worker.rs"

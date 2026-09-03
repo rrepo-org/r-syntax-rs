@@ -786,10 +786,7 @@ fn discover_runs(tokens: &[HostToken], limits: RoxygenLimits) -> (Vec<Vec<usize>
         }
         let mut run = vec![index];
         lines += 1;
-        loop {
-            let Some(newline) = tokens.get(index + 1) else {
-                break;
-            };
+        while let Some(newline) = tokens.get(index + 1) {
             if newline.kind != SyntaxKind::NEWLINE {
                 break;
             }

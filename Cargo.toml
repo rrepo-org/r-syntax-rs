@@ -7,6 +7,7 @@ members = [
     "crates/r-parser",
     "crates/r-roxygen",
     "crates/r-conformance",
+    "crates/r-corpus",
     "xtask",
 ]
 
@@ -17,7 +18,19 @@ license = "MIT OR Apache-2.0"
 rust-version = "1.81"
 
 [workspace.dependencies]
+clap = { version = "4.5", features = ["derive"] }
+flate2 = "1.0"
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 rowan = "0.17"
+rusqlite = { version = "0.32", features = ["bundled"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+sysinfo = "0.31"
+tar = "0.4"
+tempfile = "3.12"
+wait-timeout = "0.2"
+zstd = "0.13"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
