@@ -934,7 +934,7 @@ impl<'a> Parser<'a> {
             argument_count += 1;
             has_missing |= missing;
             if let Some(recovery) = recovery {
-                if missing || argument_count > 1 {
+                if missing {
                     recovery.complete(self, SyntaxKind::ERROR);
                 } else {
                     recovery.abandon(self);
@@ -957,17 +957,16 @@ impl<'a> Parser<'a> {
         if double && argument_count == 0 {
             let recovery = self.start();
             has_missing = self.argument(close, true, ctx.in_pipe_rhs);
-            argument_count = 1;
             recovery.complete(self, SyntaxKind::ERROR);
         }
         self.expect_close(close);
         if double {
             self.expect_close(SyntaxKind::R_BRACKET);
-            if argument_count != 1 || has_missing {
+            if has_missing {
                 self.error(
                     INVALID_OPERAND,
                     self.range_here(),
-                    "'[[' requires exactly one nonmissing top-level argument",
+                    "'[[' requires nonmissing top-level arguments",
                 );
             }
         }
@@ -1836,10 +1835,20 @@ mod tests {
     }
 
     #[test]
-    fn subset_tags_and_double_subset_arity_are_checked() {
+    fn subset_tags_and_double_subset_indices_are_checked() {
         parse_ok("x[name = 1, r\"(raw)\" = 2]");
         parse_ok("x[[name = 1]]");
-        for source in ["x[[]]", "x[[,]]", "x[[1, 2]]", "x[[name = ]]"] {
+        let parsed = parse_ok("x[[1, 2]]");
+        assert_eq!(parsed.status(), ParseStatus::Complete);
+        assert_eq!(
+            node_kinds(&parsed)
+                .iter()
+                .filter(|kind| **kind == SyntaxKind::ARGUMENT)
+                .count(),
+            2
+        );
+        assert!(!node_kinds(&parsed).contains(&SyntaxKind::ERROR));
+        for source in ["x[[]]", "x[[,]]", "x[[1, ]]", "x[[name = ]]"] {
             let parsed = parse_source(source, &ParserConfig::default());
             assert_eq!(parsed.status(), ParseStatus::Invalid, "{source}");
             assert!(node_kinds(&parsed).contains(&SyntaxKind::ERROR), "{source}");
